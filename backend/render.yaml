@@ -6,12 +6,8 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: postgresql+asyncpg://user:pass@your-neon-host/db
-      - key: SECRET_KEY
+        value: sqlite+aiosqlite:///./watchtower.db
+      - key: JWT_SECRET
         generateValue: true
-      - key: ALGORITHM
-        value: HS256
-      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+      - key: JWT_EXPIRY_MINUTES
         value: "1440"
-      - key: ALLOWED_ORIGINS
-        value: https://your-frontend.vercel.app
