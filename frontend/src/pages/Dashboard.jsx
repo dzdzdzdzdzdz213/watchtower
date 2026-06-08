@@ -32,13 +32,16 @@ function LiveAlertFeed() {
     if (lastAlert) setAlerts((prev) => [lastAlert, ...prev].slice(0, 20))
   }, [lastAlert])
 
-  useQuery({
+  const { data: alertData } = useQuery({
     queryKey: ['recent-alerts', org?.id],
     queryFn: () => api.get('/alerts?per_page=20').then((r) => r.data),
-    onSuccess: (data) => setAlerts(data.alerts),
     enabled: !!org,
     refetchInterval: 30000,
   })
+
+  useEffect(() => {
+    if (alertData?.alerts) setAlerts(alertData.alerts)
+  }, [alertData])
 
   return (
     <div className="card">
@@ -81,7 +84,7 @@ export default function Dashboard() {
         <StatCard icon={ScrollText} label="Total Logs (24h)" value={data?.log_count ?? 0} />
         <StatCard icon={AlertTriangle} label="Open Alerts" value={data?.open_alerts ?? 0} />
         <StatCard icon={ShieldAlert} label="Critical Alerts" value={data?.critical_alerts ?? 0} critical />
-        <StatCard icon={Activity} label="Critical Severity" value={Object.entries(data?.severity_breakdown || {}).find(([k]) => k === 'critical')?.[1] || 0} />
+        <StatCard icon={Activity} label="Total Alerts (24h)" value={data?.alert_count ?? 0} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

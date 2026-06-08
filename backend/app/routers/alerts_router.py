@@ -5,7 +5,7 @@ from sqlalchemy import select, func, and_
 
 from app.database import get_db
 from app.models import Alert, Organization, AlertStatus
-from app.routers.auth_router import get_current_org, DEV_EMAIL
+from app.routers.auth_router import get_current_org
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
@@ -18,8 +18,6 @@ async def get_alerts(
     org: Organization = Depends(get_current_org),
     db: AsyncSession = Depends(get_db),
 ):
-    if org.id == DEV_EMAIL:
-        return {"total": 0, "page": page, "per_page": per_page, "alerts": []}
     try:
         conditions = [Alert.org_id == org.id]
         if status and status != "all":
@@ -64,8 +62,6 @@ async def update_alert(
     org: Organization = Depends(get_current_org),
     db: AsyncSession = Depends(get_db),
 ):
-    if org.id == DEV_EMAIL:
-        raise HTTPException(status_code=404, detail="Alert not found")
     try:
         result = await db.execute(
             select(Alert).where(Alert.id == uuid.UUID(alert_id), Alert.org_id == org.id)

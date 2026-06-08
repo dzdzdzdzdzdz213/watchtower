@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import settings
 from app.database import init_db
 from app.routers import auth_router, ingest_router, logs_router, alerts_router, stats_router, ws_router
 
@@ -8,7 +9,7 @@ app = FastAPI(title="WatchTower SIEM", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
