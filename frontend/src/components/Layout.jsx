@@ -4,7 +4,7 @@ import { LayoutDashboard, ScrollText, AlertTriangle, Settings, LogOut, Menu, X, 
 import { useAuth } from '../context/AuthContext'
 
 const nav = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/logs', label: 'Log Explorer', icon: ScrollText },
   { to: '/alerts', label: 'Alerts', icon: AlertTriangle },
   { to: '/settings', label: 'Settings', icon: Settings },

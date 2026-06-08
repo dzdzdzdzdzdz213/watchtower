@@ -87,37 +87,47 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 card">
           <h3 className="text-sm font-semibold text-white mb-3">Events per Hour</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={data?.timeline || []}>
-              <defs>
-                {SEV_ORDER.map((s) => (<filter key={s} id={`grad-${s}`}><stop offset="5%" stopColor={SEV_COLORS[s]} stopOpacity={0.3} /><stop offset="95%" stopColor={SEV_COLORS[s]} stopOpacity={0} /></filter>))}
-              </defs>
-              <XAxis dataKey="hour" tick={{ fontSize: 10, fill: '#666' }} tickFormatter={(v) => v.slice(11, 16)} />
-              <YAxis tick={{ fontSize: 10, fill: '#666' }} />
-              <Tooltip contentStyle={{ background: '#1a1a25', border: '1px solid #333', borderRadius: 8, fontSize: 12 }} />
-              {SEV_ORDER.map((s) => (
-                <Area key={s} type="monotone" dataKey={s} stackId="1" stroke={SEV_COLORS[s]} fill={SEV_COLORS[s]} fillOpacity={0.2} />
-              ))}
-            </AreaChart>
-          </ResponsiveContainer>
+          {data?.timeline?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={data.timeline}>
+                <defs>
+                  {SEV_ORDER.map((s) => (<filter key={s} id={`grad-${s}`}><stop offset="5%" stopColor={SEV_COLORS[s]} stopOpacity={0.3} /><stop offset="95%" stopColor={SEV_COLORS[s]} stopOpacity={0} /></filter>))}
+                </defs>
+                <XAxis dataKey="hour" tick={{ fontSize: 10, fill: '#666' }} tickFormatter={(v) => v.slice(11, 16)} />
+                <YAxis tick={{ fontSize: 10, fill: '#666' }} />
+                <Tooltip contentStyle={{ background: '#1a1a25', border: '1px solid #333', borderRadius: 8, fontSize: 12 }} />
+                {SEV_ORDER.map((s) => (
+                  <Area key={s} type="monotone" dataKey={s} stackId="1" stroke={SEV_COLORS[s]} fill={SEV_COLORS[s]} fillOpacity={0.2} />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-[250px] text-xs text-gray-600">No event data in the last 24 hours</div>
+          )}
         </div>
         <div className="card">
           <h3 className="text-sm font-semibold text-white mb-3">Severity</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie data={SEV_ORDER.map((s) => ({ name: s, value: data?.severity_breakdown?.[s] || 0 })).filter((d) => d.value > 0)} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value">
-                {SEV_ORDER.map((s) => (<Cell key={s} fill={SEV_COLORS[s]} />))}
-              </Pie>
-              <Tooltip contentStyle={{ background: '#1a1a25', border: '1px solid #333', borderRadius: 8, fontSize: 12 }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="flex justify-center gap-4 text-xs text-gray-400 mt-2">
-            {SEV_ORDER.map((s) => (
-              <span key={s} className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full" style={{ background: SEV_COLORS[s] }} /> {s}
-              </span>
-            ))}
-          </div>
+          {Object.values(data?.severity_breakdown || {}).some((v) => v > 0) ? (
+            <>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie data={SEV_ORDER.map((s) => ({ name: s, value: data?.severity_breakdown?.[s] || 0 })).filter((d) => d.value > 0)} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value">
+                    {SEV_ORDER.map((s) => (<Cell key={s} fill={SEV_COLORS[s]} />))}
+                  </Pie>
+                  <Tooltip contentStyle={{ background: '#1a1a25', border: '1px solid #333', borderRadius: 8, fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center gap-4 text-xs text-gray-400 mt-2">
+                {SEV_ORDER.map((s) => (
+                  <span key={s} className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ background: SEV_COLORS[s] }} /> {s}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-[250px] text-xs text-gray-600">No severity data yet</div>
+          )}
         </div>
       </div>
 

@@ -1,28 +1,22 @@
 # WatchTower Frontend
 
-React SIEM dashboard.
+SIEM dashboard — React 18 + Vite + TailwindCSS + Recharts.
+
+**Live**: https://frontend-alpha-rose-69.vercel.app
 
 ## Setup
 
 ```bash
 npm install
-cp .env.example .env.local
 ```
 
-Set `VITE_API_URL` and `VITE_WS_URL` in `.env.local`.
-
-## Environment Variables
-
-| Variable | Description | Example |
-|---|---|---|
-| `VITE_API_URL` | Backend API URL | `https://your-app-name.onrender.com` |
-| `VITE_WS_URL` | WebSocket URL (same host, wss://) | `wss://your-app-name.onrender.com` |
-
-## Run
+## Dev
 
 ```bash
 npm run dev
 ```
+
+Proxies `/api` to `http://localhost:8000`. Set `VITE_API_URL` for production.
 
 ## Build
 
@@ -30,8 +24,8 @@ npm run dev
 npm run build
 ```
 
-## Deploy to Vercel
+## Environment Variables
 
-1. Connect repo to Vercel
-2. Set `VITE_API_URL` and `VITE_WS_URL` in Vercel dashboard
-3. Vercel detects `vercel.json` automatically
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_API_URL` | Yes (prod) | Backend API URL (https://watchtower-backend-5d3x.onrender.com) |

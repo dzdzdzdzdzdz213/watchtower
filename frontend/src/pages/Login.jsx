@@ -1,17 +1,22 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Shield } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { Shield, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 
 export default function Login() {
   const { login, register, org } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [isRegister, setIsRegister] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
 
-  if (org) { navigate('/', { replace: true }); return null }
+  useEffect(() => {
+    if (searchParams.get('register') === '1') setIsRegister(true)
+  }, [searchParams])
+
+  if (org) { navigate('/dashboard', { replace: true }); return null }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -22,7 +27,7 @@ export default function Login() {
       } else {
         await login(form.email, form.password)
       }
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Something went wrong')
     } finally {
@@ -33,6 +38,9 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-wt-900 p-4">
       <div className="w-full max-w-sm">
+        <Link to="/" className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 mb-6 transition-colors">
+          <ArrowLeft className="w-3 h-3" /> Back to Home
+        </Link>
         <div className="flex items-center justify-center gap-2 mb-8">
           <Shield className="w-6 h-6 text-wt-accent" />
           <span className="text-xl font-semibold text-white">WatchTower</span>
