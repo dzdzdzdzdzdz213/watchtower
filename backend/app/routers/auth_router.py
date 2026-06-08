@@ -45,10 +45,6 @@ DEV_API_KEY = os.getenv("DEV_API_KEY", "00000000-0000-0000-0000-000000000001")
 
 @router.post("/login")
 async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
-    # Dev mode: no DB needed for demo credentials
-    if req.email == DEV_EMAIL and req.password == DEV_PASS:
-        token = create_token(DEV_EMAIL)
-        return {"token": token, "org": {"id": DEV_EMAIL, "name": "DemoCorp", "email": DEV_EMAIL, "api_key": DEV_API_KEY, "plan": "free"}}
     try:
         result = await db.execute(select(Organization).where(Organization.email == req.email))
         org = result.scalar_one_or_none()
@@ -59,22 +55,10 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
         pass
     raise HTTPException(status_code=401, detail="Invalid email or password")
 
-class MockOrg:
-    def __init__(self):
-        self.id = DEV_EMAIL
-        self.name = "DemoCorp"
-        self.email = DEV_EMAIL
-        self.api_key = DEV_API_KEY
-        self.plan = "free"
-
-mock_org = MockOrg()
-
 async def get_current_org(credentials: HTTPAuthorizationCredentials = Depends(security), db: AsyncSession = Depends(get_db)) -> Organization:
     org_id = decode_token(credentials.credentials)
     if not org_id:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
-    if org_id == DEV_EMAIL:
-        return mock_org
     try:
         result = await db.execute(select(Organization).where(Organization.id == uuid.UUID(org_id)))
         org = result.scalar_one_or_none()

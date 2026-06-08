@@ -10,7 +10,7 @@ from app.models import Organization, LogEntry, Alert, AlertStatus
 from app.services.log_parser import parse_log
 from app.services.detection_engine import RuleEngine
 from app.services.websocket_manager import ws_manager
-from app.routers.auth_router import DEV_EMAIL, DEV_API_KEY
+
 from datetime import datetime, timezone, timedelta
 
 router = APIRouter(tags=["ingest"])
@@ -22,9 +22,6 @@ class IngestRequest(BaseModel):
 
 @router.post("/ingest/{api_key}")
 async def ingest_logs(api_key: str, req: IngestRequest, db: AsyncSession = Depends(get_db)):
-    if api_key == DEV_API_KEY:
-        parsed_count = len(req.logs)
-        return {"ingested": parsed_count, "alerts_created": 0, "errors": []}
     try:
         result = await db.execute(select(Organization).where(Organization.api_key == uuid.UUID(api_key)))
         org = result.scalar_one_or_none()

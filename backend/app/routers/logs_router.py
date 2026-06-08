@@ -4,7 +4,7 @@ from sqlalchemy import select, func, and_
 
 from app.database import get_db
 from app.models import LogEntry, Organization
-from app.routers.auth_router import get_current_org, DEV_EMAIL
+from app.routers.auth_router import get_current_org
 
 router = APIRouter(prefix="/logs", tags=["logs"])
 
@@ -21,8 +21,6 @@ async def get_logs(
     org: Organization = Depends(get_current_org),
     db: AsyncSession = Depends(get_db),
 ):
-    if org.id == DEV_EMAIL:
-        return {"total": 0, "page": page, "per_page": per_page, "logs": []}
     try:
         conditions = [LogEntry.org_id == org.id]
         if severity:

@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from app.database import get_db
 from app.models import LogEntry, Alert, Organization, AlertStatus, Severity
-from app.routers.auth_router import get_current_org, DEV_EMAIL
+from app.routers.auth_router import get_current_org
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 
@@ -15,11 +15,6 @@ async def get_stats(
     org: Organization = Depends(get_current_org),
     db: AsyncSession = Depends(get_db),
 ):
-    if org.id == DEV_EMAIL:
-        return {
-            "log_count": 0, "alert_count": 0, "open_alerts": 0, "critical_alerts": 0,
-            "severity_breakdown": {}, "timeline": [], "top_source_ips": [], "top_event_types": [],
-        }
     try:
         since = datetime.now(timezone.utc) - timedelta(hours=24)
 
