@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, text
+from sqlalchemy import select, func, and_, text, String, cast
 from datetime import datetime, timezone, timedelta
 
 from app.database import get_db
@@ -46,7 +46,7 @@ async def get_stats(
         severity_breakdown = {r.severity: r.cnt for r in sev_rows}
 
         hourly_q = select(
-            func.date_trunc('hour', LogEntry.timestamp).label('hour'),
+            func.substr(cast(LogEntry.timestamp, String), 1, 13).label('hour'),
             LogEntry.severity,
             func.count(LogEntry.id).label('cnt'),
         ).where(LogEntry.org_id == org.id, LogEntry.timestamp >= since
