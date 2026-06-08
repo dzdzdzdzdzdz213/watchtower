@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
@@ -67,7 +68,7 @@ async def update_alert(
         raise HTTPException(status_code=404, detail="Alert not found")
     try:
         result = await db.execute(
-            select(Alert).where(Alert.id == alert_id, Alert.org_id == org.id)
+            select(Alert).where(Alert.id == uuid.UUID(alert_id), Alert.org_id == org.id)
         )
         alert = result.scalar_one_or_none()
         if not alert:

@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from sqlalchemy import select
 from app.database import async_session
@@ -10,7 +11,7 @@ router = APIRouter()
 @router.websocket("/ws/{api_key}")
 async def websocket_endpoint(ws: WebSocket, api_key: str):
     async with async_session() as db:
-        result = await db.execute(select(Organization).where(Organization.api_key == api_key))
+        result = await db.execute(select(Organization).where(Organization.api_key == uuid.UUID(api_key)))
         org = result.scalar_one_or_none()
         if not org:
             await ws.close(code=4001)

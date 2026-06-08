@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, JSON, Enum as SAEnum
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Text, JSON, Enum as SAEnum, Uuid
 from sqlalchemy.orm import relationship
 import enum
 
@@ -23,11 +22,11 @@ class AlertStatus(str, enum.Enum):
 class Organization(Base):
     __tablename__ = "organizations"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(Uuid(), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
-    api_key = Column(UUID(as_uuid=True), unique=True, default=uuid.uuid4, index=True)
+    api_key = Column(Uuid(), unique=True, default=uuid.uuid4, index=True)
     plan = Column(String(20), default="free")
     created_at = Column(DateTime(timezone=True), default=utcnow)
 
@@ -37,8 +36,8 @@ class Organization(Base):
 class LogEntry(Base):
     __tablename__ = "log_entries"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(Uuid(), primary_key=True, default=uuid.uuid4)
+    org_id = Column(Uuid(), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(DateTime(timezone=True), nullable=False)
     source_ip = Column(String(45), nullable=True)
     event_type = Column(String(100), nullable=True)
@@ -54,8 +53,8 @@ class LogEntry(Base):
 class Alert(Base):
     __tablename__ = "alerts"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(Uuid(), primary_key=True, default=uuid.uuid4)
+    org_id = Column(Uuid(), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     rule_name = Column(String(100), nullable=False)
     severity = Column(SAEnum(Severity), nullable=False)
     description = Column(Text, nullable=False)

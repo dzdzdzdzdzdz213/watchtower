@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -25,7 +26,7 @@ async def ingest_logs(api_key: str, req: IngestRequest, db: AsyncSession = Depen
         parsed_count = len(req.logs)
         return {"ingested": parsed_count, "alerts_created": 0, "errors": []}
     try:
-        result = await db.execute(select(Organization).where(Organization.api_key == api_key))
+        result = await db.execute(select(Organization).where(Organization.api_key == uuid.UUID(api_key)))
         org = result.scalar_one_or_none()
         if not org:
             raise HTTPException(status_code=404, detail="Invalid API key")

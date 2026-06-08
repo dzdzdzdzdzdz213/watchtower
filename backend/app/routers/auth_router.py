@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -75,7 +76,7 @@ async def get_current_org(credentials: HTTPAuthorizationCredentials = Depends(se
     if org_id == DEV_EMAIL:
         return mock_org
     try:
-        result = await db.execute(select(Organization).where(Organization.id == org_id))
+        result = await db.execute(select(Organization).where(Organization.id == uuid.UUID(org_id)))
         org = result.scalar_one_or_none()
         if not org:
             raise HTTPException(status_code=401, detail="Organization not found")
