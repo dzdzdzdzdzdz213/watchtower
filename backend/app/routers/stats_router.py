@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from datetime import datetime, timezone, timedelta
+from collections import defaultdict
 
 from app.database import get_db
-from app.models import LogEntry, Alert, Organization, AlertStatus
+from app.models import LogEntry, Alert, Organization, AlertStatus, Severity
 from app.routers.auth_router import get_current_org, DEV_EMAIL
 
 router = APIRouter(prefix="/stats", tags=["stats"])
@@ -39,8 +40,24 @@ async def get_stats(
         )
         critical_count = (await db.execute(critical_q)).scalar() or 0
 
-        severity_breakdown = {}
-        timeline = []
+        sev_q = select(Alert.severity, func.count(Alert.id).label("cnt")).where(
+            Alert.org_id == org.id, Alert.status == AlertStatus.open, Alert.last_seen >= since
+        ).group_by(Alert.severity)
+        sev_rows = (await db.execute(sev_q)).all()
+        severity_breakdown = {s.value: 0 for s in Severity}
+        for r in sev_rows:
+            severity_breakdown[r.severity.value] = r.cnt
+
+        logs_q = select(LogEntry.timestamp, LogEntry.severity).where(
+            LogEntry.org_id == org.id, LogEntry.timestamp >= since,
+        ).order_by(LogEntry.timestamp)
+        log_rows = (await db.execute(logs_q)).all()
+        hourly = defaultdict(lambda: {"critical": 0, "warning": 0, "info": 0})
+        for r in log_rows:
+            if r.timestamp:
+                hour_key = r.timestamp.strftime("%Y-%m-%dT%H:00:00")
+                hourly[hour_key][r.severity.value] += 1
+        timeline = [{"hour": h, **counts} for h, counts in sorted(hourly.items())]
 
         top_ips_q = select(LogEntry.source_ip, func.count(LogEntry.id).label("cnt")).where(
             LogEntry.org_id == org.id, LogEntry.timestamp >= since,
