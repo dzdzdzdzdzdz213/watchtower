@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, text, String, cast
+from sqlalchemy import select, func, and_, text, String, Text, cast
 from datetime import datetime, timezone, timedelta
 
 from app.database import get_db
@@ -46,7 +46,7 @@ async def get_stats(
         severity_breakdown = {r.severity: r.cnt for r in sev_rows}
 
         hourly_q = select(
-            func.substr(cast(LogEntry.timestamp, String), 1, 13).label('hour'),
+            func.substr(cast(LogEntry.timestamp, Text), 1, 13).label('hour'),
             LogEntry.severity,
             func.count(LogEntry.id).label('cnt'),
         ).where(LogEntry.org_id == org.id, LogEntry.timestamp >= since
@@ -61,13 +61,13 @@ async def get_stats(
 
         top_ips_q = select(LogEntry.source_ip, func.count(LogEntry.id).label("cnt")).where(
             LogEntry.org_id == org.id, LogEntry.timestamp >= since,
-            LogEntry.source_ip.isnot(None), LogEntry.source_ip != "",
+            LogEntry.source_ip.is_not(None), LogEntry.source_ip != "",
         ).group_by(LogEntry.source_ip).order_by(text("cnt desc")).limit(10)
         top_ips = [{"ip": r.source_ip, "count": r.cnt} for r in (await db.execute(top_ips_q)).all()]
 
         top_events_q = select(LogEntry.event_type, func.count(LogEntry.id).label("cnt")).where(
             LogEntry.org_id == org.id, LogEntry.timestamp >= since,
-            LogEntry.event_type.isnot(None), LogEntry.event_type != "",
+            LogEntry.event_type.is_not(None), LogEntry.event_type != "",
         ).group_by(LogEntry.event_type).order_by(text("cnt desc")).limit(5)
         top_events = [{"event_type": r.event_type, "count": r.cnt} for r in (await db.execute(top_events_q)).all()]
 
