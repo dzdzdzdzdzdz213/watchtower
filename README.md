@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Language: Python](https://img.shields.io/badge/Language-Python-3776AB.svg)]()
-[![Stars](https://img.shields.io/github/stars/placeholder/watchtower-siem?style=social)]()
+[![Stars](https://img.shields.io/github/stars/dzdzdzdzdzdz213/watchtower-siem?style=social)]()
 [![Status: Active](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
 
 </div>
@@ -68,7 +68,7 @@ WatchTower SIEM is a full-stack security information and event management platfo
 
 ```bash
 # Clone the repository
-git clone https://github.com/placeholder/watchtower-siem.git
+git clone https://github.com/dzdzdzdzdzdz213/watchtower-siem.git
 cd watchtower-siem
 
 # Start the backend
